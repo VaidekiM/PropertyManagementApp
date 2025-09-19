@@ -9,6 +9,14 @@
       "PackagePath": "staticwebassets/css/dashboard.css"
     },
     {
+      "Id": "/Users/vaidekimuralitharan/Desktop/PropertyManagementApp/wwwroot/css/login.css",
+      "PackagePath": "staticwebassets/css/login.css"
+    },
+    {
+      "Id": "/Users/vaidekimuralitharan/Desktop/PropertyManagementApp/wwwroot/css/register.css",
+      "PackagePath": "staticwebassets/css/register.css"
+    },
+    {
       "Id": "/Users/vaidekimuralitharan/Desktop/PropertyManagementApp/wwwroot/css/site.css",
       "PackagePath": "staticwebassets/css/site.css"
     },

@@ -105,7 +105,7 @@ public class AccountController : Controller
             {
                 // Store user info in session
                 _logger.LogInformation("Login successful for user {Email}", email);
-                HttpContext.Session.SetString("UserName", user.FirstName + user.LastName);
+                HttpContext.Session.SetString("UserName", user.FirstName + " " + user.LastName);
                 HttpContext.Session.SetString("UserRole", user.IsAdmin ? "Admin" : "User");
                 HttpContext.Session.SetString("IsAdmin", user.IsAdmin.ToString());
 
