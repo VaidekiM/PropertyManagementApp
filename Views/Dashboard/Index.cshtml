@@ -1,0 +1,214 @@
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="tempAlert" class="alert alert-success" style="position: fixed; top: 117px; right: 104px; z-index: 9999;">
+        @TempData["SuccessMessage"]
+    </div>
+
+    <script>
+        setTimeout(function() {
+            var alert = document.getElementById('tempAlert');
+            if (alert) {
+                alert.style.display = 'none';
+            }
+        }, 3000);
+    </script>
+
+    <style>
+        #tempAlert {
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-weight: bold;
+            opacity: 0.95;
+            transition: opacity 0.5s ease;
+        }
+    </style>
+}
+@{
+    Layout = null;
+    ViewData["Title"] = "Dashboard";
+    var userRole = Context.Session.GetString("UserRole");
+    var userName = Context.Session.GetString("UserName") ?? "User";
+    var isAdmin = userRole == "Admin";
+    var properties = ViewBag.Properties as List<Properties>;
+}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>@ViewData["Title"]</title>
+        <link rel="stylesheet" href="@Url.Content("~/css/dashboard.css")" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    </head>
+    <body>
+        <div class="dashboard-container">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h2>Dashboard</h2>
+                <a asp-controller="Dashboard" asp-action="Index">Home</a>
+                @if (isAdmin)
+                {
+                    <a asp-controller="Property" asp-action="Manage">Manage Properties</a>
+                }
+            </div>
+
+            <!-- Main content -->
+            <div class="main-content">
+                <!-- Topbar -->
+                <div class="topbar">
+                    <h3>Welcome!</h3>
+                    <div class="user-info">
+                        <span>@userName (@userRole)</span>
+                        <span>👤</span>
+                        <a asp-controller="Account" asp-action="Logout">Logout</a>
+                    </div>
+                </div>
+
+                <div class="content">
+                    <div class="properties-header">
+                        <h2>Properties</h2>
+                        @if (isAdmin)
+                        {
+                            <button class="add-btn" id="openAddModal">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        }
+                    </div>
+
+                    <div class="property-grid">
+                        @if (properties != null && properties.Any())
+                        {
+                            foreach (var p in properties)
+                            {
+                                <div class="property-card">
+                                    @if (isAdmin)
+                                    {
+                                        <div class="card-actions">
+                                            <button type="button" class="edit-btn"
+                                                data-id="@p.Id" 
+                                                data-name="@p.Name" 
+                                                data-location="@p.Location" 
+                                                data-price="@p.Price" 
+                                                title="Edit">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </button>
+                                            <form asp-action="DeleteProperty" method="post" style="display:inline;">
+                                                <input type="hidden" name="Id" value="@p.Id" />
+                                                <button type="submit" class="delete-btn" title="Delete">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+
+                                    <h3>@p.Name</h3>
+                                    <p><strong>Location:</strong> @p.Location</p>
+                                    <p><strong>Price:</strong> $@p.Price.ToString("0.##")</p>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p>No properties available.</p>
+                        }
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <a href="#">« Prev</a>
+                        <a href="#" class="active">1</a>
+                        <a href="#">2</a>
+                        <a href="#">3</a>
+                        <a href="#">Next »</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Modal -->
+        <div id="addModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" id="closeAddModal">&times;</span>
+                <h3>Add Property</h3>
+                <form method="post" asp-action="AddProperty">
+                    <label>Name</label>
+                    <input type="text" name="Name" required />
+
+                    <label>Location</label>
+                    <input type="text" name="Location" required />
+
+                    <label>Price</label>
+                    <input type="number" name="Price" required />
+
+                    <button type="submit" class="save-btn">Save</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" id="closeEditModal">&times;</span>
+                <h3>Edit Property</h3>
+                <form id="editForm" method="post" asp-action="EditProperty">
+                    <input type="hidden" name="Id" id="editPropertyId" />
+                    
+                    <label>Name</label>
+                    <input type="text" name="Name" id="editName" required />
+
+                    <label>Location</label>
+                    <input type="text" name="Location" id="editLocation" required />
+
+                    <label>Price</label>
+                    <input type="number" name="Price" id="editPrice" required />
+
+                    <button type="submit" class="save-btn">Save</button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            const addModal = document.getElementById("addModal");
+            const openBtn = document.getElementById("openAddModal");
+            const closeBtn = document.getElementById("closeAddModal");
+
+            if (openBtn) {
+                console.log("Button clicked!");
+                openBtn.addEventListener("click", () => {
+                    addModal.classList.add("show");
+                });
+            }
+            if (closeBtn) {
+                closeBtn.addEventListener("click", () => {
+                    addModal.classList.remove("show");
+                });
+            }
+
+            const editModal = document.getElementById("editModal");
+            const closeEditBtn = document.getElementById("closeEditModal");
+
+            // Open Edit modal
+            document.querySelectorAll(".edit-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    document.getElementById("editPropertyId").value = btn.dataset.id;
+                    document.getElementById("editName").value = btn.dataset.name;
+                    document.getElementById("editLocation").value = btn.dataset.location;
+                    document.getElementById("editPrice").value = btn.dataset.price;
+                    editModal.classList.add("show");
+                });
+            });
+
+            // Close Edit modal
+            if (closeEditBtn) {
+                closeEditBtn.addEventListener("click", () => {
+                    editModal.classList.remove("show");
+                });
+            }
+
+            window.onclick = (event) => {
+                if (event.target == addModal) addModal.classList.remove("show");
+                if (event.target == editModal) editModal.classList.remove("show");
+            };
+        </script>
+    </body>
+</html>
