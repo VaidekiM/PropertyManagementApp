@@ -30,11 +30,6 @@ builder.Host.UseSerilog();
 
 var app = builder.Build();
 Log.Information("Application Starting");
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    DataSeeder.Seed(context);
-}
 
 //Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

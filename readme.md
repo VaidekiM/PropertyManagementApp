@@ -17,11 +17,10 @@ This is an ASP.NET Core MVC project for property management.
 ## Folder Structure
     PropertyManagementApp/
     │
-    ├── Controllers/             
+    ├── Controllers/             # This contains the project main controllers to handle login, registration, dashboard CRUD
     ├── Models/                  # Entity classes representing database tables
     ├── Data/                    # Database context
     ├── DTO/                     # Data Transfer Objects for front-end/back-end communication
-    ├── Helper/                  # Seeding logic
     ├── Views/                   # Razor Views (UI pages)
     ├── wwwroot/                 # Static files (CSS)
     ├── Migrations/              # EF Core migrations
@@ -31,11 +30,11 @@ This is an ASP.NET Core MVC project for property management.
 
 ## Migrations
 All migrations are included. To update the database, run:
-    dotnet ef database update
-
-## Seeding Data
-A default admin user will be created automatically when the app runs for the first time.
-    - **Email:** admin@test.com  
-    - **Password:** Admin@123  
+    dotnet ef database update  
 
 ## Default start page is the login page (/Account/Login).
+
+1. The application allows only one admin user by default.
+2. During registration, users can select the Admin checkbox. If an admin already exists, the system temporarily prevents additional admin registrations. (Note: functionality to contact the admin for admin access can be implemented in the future)
+3. The admin user has full access to the dashboard, including adding, editing, and deleting properties.
+4. Regular users have view-only access to the properties on the dashboard.
